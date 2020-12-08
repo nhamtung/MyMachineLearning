@@ -48,7 +48,7 @@ def compare_distance(emb1, emb2, j):
 def read_image_encode(emb1):
     global num, name
     for j in os.listdir(imageEncode_folder):
-        num = 0;
+        num = 0
         imageEncode_folder_path = os.path.join(imageEncode_folder, j)
         for f in os.listdir(imageEncode_folder_path):
             imageEncode_path = os.path.join(imageEncode_folder_path, f)
