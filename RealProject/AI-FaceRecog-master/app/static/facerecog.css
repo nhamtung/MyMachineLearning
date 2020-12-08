@@ -1,0 +1,33 @@
+#text {
+    color: green;
+    position:absolute;
+    width: 640px;
+    height: 480px;
+    top: 0px;
+    left: 0px;
+    text-align: center;
+    font-weight : bold;
+    font-size : 20;
+
+}
+
+ #video {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 640px;
+    height: 480px;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+  }
+
+  #overlay{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 640px;
+    height: 480px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: aqua;
+  }

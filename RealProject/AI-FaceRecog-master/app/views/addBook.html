@@ -1,0 +1,102 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../static/qrcode/qrcode.js"></script>
+
+<body style="background-color: whitesmoke">
+    <div class="container">
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <div>
+                    <span>Tên sách</span>
+                    <input class="form-control" id="book_name" placeholder="Nhập tên sách" />
+                </div><br>
+                <div>
+                    <span>Tác giả</span>
+                    <input class="form-control" id="book_author" placeholder="Nhập tên tác giả" />
+                </div><br>
+                <div>
+                    <span>Mô tả</span><br>
+                    <textarea id="book_description" class="form-control" rows="5"></textarea>
+                </div><br>
+                <div>
+                    <div id="book_code"></div><br>
+                    <button class="btn btn-success" id="btn_gen_qr_code" onclick="generateQRCode()"> Generate QR code</button>
+                    <button class="btn btn-primary" id="btn_done" onclick="save()" disabled style="display: none"> Done</button>
+                </div><br>
+            </div>
+        </div><br>
+
+        <div>
+
+        </div>
+        <canvas id="canvas" style="display:none"></canvas>
+        <img id="photo">
+    </div>
+</body>
+
+<script>
+    var book_code = null
+    function generateQRCode() {
+        name = $("#book_name").val().trim();
+        author = $("#book_author").val().trim();
+
+        if (name == '') {
+            alert('Vui lòng nhập tên sách')
+            return;
+        }
+
+        if (author == '') {
+            alert('Vui lòng nhập tên tác giả');
+            return;
+        }
+
+        $.ajax({
+            url: '/qr/book_code',
+            contentType: 'application/json',
+            method: "GET",
+            success: function (result) {
+                book_code = result.code
+                new QRCode("book_code", {
+                    text: result.code,
+                    width: 500,
+                    height: 500,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            
+                document.getElementById("btn_gen_qr_code").style.display = "none";
+                document.getElementById("btn_done").disabled = false;
+                document.getElementById("btn_done").style.display = "inline";
+                document.getElementById("book_name").disabled = true;
+                document.getElementById("book_author").disabled = true;
+            }
+        })
+    }
+
+    function save() {
+        book_name = $("#book_name").val().trim();
+        book_author = $("#book_author").val().trim();
+        book_description = $("#book_description").val().trim();
+        $.ajax({
+            url: '/qr/save_book',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                book_code: book_code,
+                book_name: book_name,
+                book_author: book_author,
+                book_description: book_description
+            }),
+            method: "POST",
+            success: function (result) {
+                window.location.replace('/books');
+            }
+        })
+    }
+</script>
+
+</html>

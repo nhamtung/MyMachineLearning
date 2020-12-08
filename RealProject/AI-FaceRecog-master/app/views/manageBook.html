@@ -1,0 +1,85 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="static/styles.css" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/vue/2.1.6/vue.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+
+<body>
+    <div class="container ">
+        <br>
+        <div>
+            <form action="/books/add">
+                <input class=" btn btn-primary" type="submit" value="Add book" />
+            </form>
+            <div id="data">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Tên sách</th>
+                            <th>Tác giả</th>
+                            <th>Mô tả</th>
+                        </tr>
+                    </thead>
+
+                    <tr v-for="(book,index) in books">
+                        <td>{{ book.code }}</td>
+                        <td>{{ book.name }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ book.description }}</td>
+                        <td>
+                            <button class="btn btn-danger" type="button" @click='deleteRow(index)'>Delete</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" type="button" @click='detail(index)'>Detail</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div><br>
+    </div>
+
+</body>
+
+<script>
+    new Vue({
+        el: "#data",
+        created() {
+            this.fetchData();
+        },
+        data: {
+            books: [
+            ]
+        },
+        methods: {
+            fetchData() {
+                axios.get('/get_books').then(response => {
+                    this.books = response.data;
+                });
+            },
+            deleteRow(index) {
+                var r = confirm("Do you want to remove it?")
+                if (r == true) {
+                    $.ajax({
+                        url: '/delete_book',
+                        contentType: "application/json",
+                        data: JSON.stringify({ book_code: this.books[index].code }),
+                        method: "POST",
+                        success: function (result) {
+                            location.reload()
+                        }
+                    });
+                }
+            },
+            detail(index){
+                var code = this.books[index].code
+                window.location.href = '/books/'.concat(code)
+            }
+        }
+    });
+</script>
+
+</html>

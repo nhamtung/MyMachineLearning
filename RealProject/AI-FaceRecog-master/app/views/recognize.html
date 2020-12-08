@@ -1,0 +1,28 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="../static/facerecog.css" />
+<link rel="stylesheet" href="static/styles.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="../static/facerecog.js"></script>
+
+<body style="background-color: black">
+    <div class="container">
+        <br>
+        <h1 id="state" style="color: blueviolet; font-size: 18px; display: none"></h1><br>
+        <div class="row">
+            <div class="col-md-4">
+                <canvas id="canvas" style="display: none"></canvas>
+                <video id="video" autoplay muted></video>
+                <canvas id="overlay"></canvas>
+                <canvas id="face_track"></canvas>
+                <span id="text"></span>
+            </div>
+        </div>
+        
+    </div>
+</body>
+
+</html>

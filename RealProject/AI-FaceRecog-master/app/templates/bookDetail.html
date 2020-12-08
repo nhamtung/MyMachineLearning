@@ -1,0 +1,101 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../static/qrcode/qrcode.js"></script>
+
+<body style="background-color: whitesmoke">
+    <div class="container">
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <div>
+                    <span>Tên sách</span>
+                    <input class="form-control" id="book_name" disabled />
+                </div><br>
+                <div>
+                    <span>Tác giả</span>
+                    <input class="form-control" id="book_author" disabled />
+                </div><br>
+                <div>
+                    <span>Mô tả</span><br>
+                    <textarea id="book_description" class="form-control" rows="5" disabled></textarea>
+                </div><br>
+            </div>
+            <div class="col-md-3">
+                <div id="book_code"></div><br>  
+                <button class="btn btn-primary" id="btn_download_qr" onclick="downloadQrCode()">Download QR Code</button>
+            </div>
+        </div><br>
+        <button class="btn btn-primary" id="btn_action" onclick="editBook()">Edit book</button>
+        <canvas id="canvas" style="display:none"></canvas>
+        <img id="photo">
+    </div>
+</body>
+    <script>
+        const MODE_VIEW = 0;
+        const MODE_EDIT = 1;
+        var mode = MODE_VIEW;
+        $(window).ready(function () {
+            startup();
+        });
+    
+        function startup() {
+            var book_code = {{ code| tojson}};
+            $.ajax({
+                url: '/books/book_detail',
+                contentType: 'application/json',
+                method: "POST",
+                data: JSON.stringify({
+                    code: book_code
+                }),
+                success: function (result) {
+                    new QRCode("book_code", {
+                        text: book_code,
+                        width: 400,
+                        height: 400,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+    
+                    document.getElementById("book_name").value = result.name;
+                    document.getElementById("book_author").value = result.author;
+                    document.getElementById("book_description").value = result.description;
+                }
+            })
+        }
+    
+        function editBook() {
+            if (mode == MODE_VIEW) {
+                mode = MODE_EDIT;
+                document.getElementById("btn_action").innerHTML = "Save";
+                document.getElementById("book_name").disabled = false;
+                document.getElementById("book_author").disabled = false;
+                document.getElementById("book_description").disabled = false;
+            } else {
+                mode = MODE_VIEW;
+                document.getElementById("btn_action").innerHTML = "Edit";
+                document.getElementById("book_name").disabled = true;
+                document.getElementById("book_author").disabled = true;
+                document.getElementById("book_description").disabled = true;
+            }
+        }
+
+        function downloadQrCode(){
+            var book_name =document.getElementById("book_name").value; 
+            var book_author=document.getElementById("book_author").value; 
+            var data = document.querySelector('#book_code img').getAttribute("src");
+            var replaceStr = 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20'+ book_name+'-'+book_author+'.png;';
+            var url = data.replace(/^data:image\/[^;]+/, replaceStr)
+            let a = $("<a />", {
+            href: url,
+            download: book_name+'-'+book_author+'.png'
+            })
+            .appendTo("body")
+            .get(0)
+            .click();
+        }
+    </script>
+</html>

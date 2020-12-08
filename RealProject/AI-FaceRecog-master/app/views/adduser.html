@@ -1,0 +1,46 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="../static/facerecog.css" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../static/adduser.js"></script>
+
+<body style="background-color:black">
+    <div class="container">
+        <br>
+        <p style="color:aquamarine">Để lấy thông tin khuôn mặt chính xác<br>
+            1. Bỏ kính hoặc các vật dụng không cần thiết<br>
+            2. Nhìn thẳng vào camera<br>
+            3. Có thể hơi thay đổi góc nhìn để hệ thống có thể mô tả tổng quát hơn về khuôn mặt
+         </p><br>
+        <div class="row">
+            <div class="col-md-7">
+                <video id="video" autoplay muted>Video stream not available.</video>
+                <canvas id="canvas" style="display: none"></canvas>
+                <canvas id="overlay"></canvas>
+                <span id="text"></span>
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <span style="color:aliceblue">Mã nhân viên</span>
+                    <input class="form-control" id="staff_code" placeholder="Mã nhân viên" />
+                </div><br>
+                <div>
+                    <span style="color:aliceblue">Họ tên</span>
+                    <input class="form-control" id="fullname" placeholder="Họ tên" />
+                </div><br>
+
+                <button class="btn btn-primary" id="recordBtn" onclick="addUser()">Start recording</button><br><br>
+
+                <form action="/recognize">
+                    <input class=" btn btn-success" type="submit" value="Recognize Mode" />
+                </form>
+                <a href="/users">Manage user</a>
+            </div>
+        </div>
+        <img id="photo">
+    </div>
+</body>
+
+</html>

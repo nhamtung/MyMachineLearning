@@ -1,0 +1,94 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="static/styles.css" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/vue/2.1.6/vue.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+
+<body>
+    <div class="container ">
+        <br>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <form action="/users/add">
+                    <input class=" btn btn-primary" type="submit" value="Add user" />
+                </form>
+                <div id="data">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã nhân viên</th>
+                                <th>Họ tên</th>
+                            </tr>
+                        </thead>
+
+                        <tr v-for="(user,index) in users" >
+                            <td>{{ user.staff_code }}</td>
+                            <td>{{ user.fullname }}</td>
+                            <td>
+                                <button class="btn btn-danger" type="button" @click='deleteRow(index)'>Delete</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div><br>
+        </div>
+    </div>
+
+</body>
+
+<script>
+
+    // function deleteUser(e) {
+    //     var r = confirm("Do you really want to terminate this dude?")
+    //     if (r == true) {
+    //         $.ajax({
+    //             url: 'delete_user',
+    //             contentType: "application/json",
+    //             data: JSON.stringify({ staff_code: e.target }),
+    //             method: "POST",
+    //             success: function (result) {
+    //                 location.reload()
+    //             }
+    //         });
+    //     }
+    // }
+
+    new Vue({
+        el: "#data",
+        created() {
+            this.fetchData();
+        },
+        data: {
+            users: [
+            ]
+        },
+        methods: {
+            fetchData() {
+                axios.get('/user/get_users').then(response => {
+                    this.users = response.data;
+                });
+            },
+            deleteRow(index) {
+                var r = confirm("Do you really want to terminate this dude?")
+                if (r == true) {
+                    $.ajax({
+                        url: '/delete_user',
+                        contentType: "application/json",
+                        data: JSON.stringify({staff_code: this.users[index].staff_code}),
+                        method: "POST",
+                        success: function (result) {
+                            location.reload()
+                        }
+                    });
+                }
+            }
+        }
+    });
+</script>
+
+</html>

@@ -1,0 +1,52 @@
+<html>
+<link rel="stylesheet" href="../static/styles.css">
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/vue/2.1.6/vue.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+
+<body>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div id="app">
+                <table class="table table-hover">
+                    <tr>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Time</th>
+                    </tr>
+
+                    <tr v-for="checkIn in checkIns">
+                        <td>{{ checkIn.fullname }}</td>
+                        <td>{{ checkIn.bookname }}</td>
+                        <td>{{ checkIn.time }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+
+</body>
+
+<script>
+    new Vue({
+        el: "#app",
+        created() {
+            this.fetchData();
+        },
+        data: {
+            checkIns: [
+            ]
+        },
+        methods: {
+            fetchData() {
+                axios.get('/get_checkin_history').then(response => {
+                    this.checkIns = response.data;
+                });
+            }
+        }
+    });
+</script>
+
+</html>
