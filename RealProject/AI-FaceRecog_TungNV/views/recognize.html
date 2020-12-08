@@ -1,0 +1,127 @@
+<html>
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="static/facerecog.css" />
+<link rel="stylesheet" href="static/styles.css">
+<!-- <script src="static/commons.js"></script>
+<script src="static/drawing.js"></script>
+<script src="static/face-api.js"></script>
+<script src="static/faceDetectionControls.js"></script> -->
+<script src="static/clmtrackr.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script>
+    var streaming = false;
+    var video = null;
+    var canvas = null;
+    var photo = null;
+
+    $(window).ready(function () {
+        loadModels();
+        startup();
+    });
+
+    async function loadModels(){
+        await changeFaceDetector(SSD_MOBILENETV1)
+        await faceapi.loadFaceLandmarkModel('static/preprocess_models')
+    }
+
+    async function startup() {
+        video = document.getElementById('video');
+        canvas = document.getElementById('canvas');
+        photo = document.getElementById('photo');
+
+        var ctracker = new clm.tracker();
+        ctracker.init();
+        ctracker.start(videoInput);
+        
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function (stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function (err) {
+                console.log("An error occurred! " + err);
+            });
+    }
+
+    function captureImage() {
+        var context = canvas.getContext('2d');
+        var width = video.videoWidth;
+        var height = video.videoHeight;
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(video, 0, 0, width, height);
+        return canvas.toDataURL('image/jpeg');
+    }
+
+    function post(data, action, callback) {
+        $.ajax({
+            url: action,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            method: "POST",
+            success: function (result) {
+                if (callback) callback(result);
+            }
+        });
+    }
+
+    async function onPlay() {
+        if (video.paused || video.ended || !isFaceDetectionModelLoaded())
+            return setTimeout(() => onPlay())
+        console.log("on Play")
+        result = await faceapi.detectSingleFace(videol, new faceapi.SsdMobilenetv1Options(0.5))
+        if (result) {
+            console.log(result)
+            drawDetections(video, $('#overlay').get(0), [result], true)
+        }
+        setTimeout(() => onPlay(), 100)
+    }
+
+    // async function onPlay() {
+    //     setInterval(()=>{
+    //         if (video.paused || video.ended || !isFaceDetectionModelLoaded())
+    //             return
+
+    //         result = faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options(0.5))
+    //         if (result) {
+    //             console.log(result)
+    //             drawDetections(video, $('#overlay').get(0), [result], true)
+    //         }
+    //     }, 150);
+    // }
+
+    setInterval(function () {
+        var imageData = captureImage();
+        if (imageData.length <= 23) return;
+        post({ image_data: imageData }, '/recognize',
+            function (result) {
+                $("#text").css("fontSize", 18);
+                $("#text").text(result.username);
+                var context = canvas.getContext('2d');
+                context.rect(20, 20, 150, 150);
+                context.strokeStyle = "green";
+                context.stroke();
+            }
+        );
+    }, 500);
+
+</script>
+
+<body style="background-color: black">
+    <div class="container">
+        <div class="row">
+            <div class="col-3"></div>
+            <div class="margin" style="position: relative">
+                <video onplay="onPlay(this)" id="video" autoplay muted></video>
+                <div id="text"></div>
+                <canvas id="overlay"></canvas>
+
+            </div>
+        </div>
+        <canvas id="canvas" style="display:none"></canvas>
+    </div>
+</body>
+
+</html>

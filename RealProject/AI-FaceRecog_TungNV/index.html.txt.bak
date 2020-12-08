@@ -1,0 +1,85 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<div class="camera">
+    <video id="video">Video stream not available.</video>
+</div>
+
+<div class="output">
+    <img id="photo" alt="The screen capture will appear in this box.">
+</div>
+
+<script type="text/javascript">
+    var width = 640;
+    var height = 0;
+
+    var streaming = false;
+
+    var video = null;
+    var photo = null;
+    var startbutton = null;
+
+    function startup() {
+        video = document.getElementById('video');
+        photo = document.getElementById('photo');
+        startbutton = document.getElementById('startbutton');
+        
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(err) {
+                console.log("An error occurred! " + err);
+            });
+
+        video.addEventListener('canplay', function(ev){
+            if (!streaming) {
+                height = video.videoHeight / (video.videoWidth/width);
+
+                video.setAttribute('width', width);
+                video.setAttribute('height', height);
+                streaming = true;
+            }
+        }, false);
+
+
+        setInterval(takepicture, 2000);
+
+        clearphoto();
+    }
+
+    function clearphoto() {
+        photo.setAttribute('src', "");
+    }
+
+
+    function takepicture() {        
+        if (width && height) {
+          var canvas = document.createElement('canvas');          
+          canvas.width = width;
+          canvas.height = height;
+          var context = canvas.getContext('2d');
+          context.drawImage(video, 0, 0, width, height);
+
+          var data = canvas.toDataURL('image/jpeg');
+          photo.setAttribute('src', data);
+
+          var image_data = JSON.stringify({image_data : data});
+          alert(image_data);
+
+          $.ajax({
+             url: "/images/save", 
+             contentType: "application/json",             
+             data : image_data,
+             method: "POST",
+             success: function(result){               
+             }
+         });
+
+        } else {
+          clearphoto();
+        }
+    }
+
+    startup();
+</script>
