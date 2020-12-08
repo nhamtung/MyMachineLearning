@@ -10,6 +10,8 @@
 # Written by JK Jung <jkjung13@gmail.com>
 # --------------------------------------------------------
 
+# https://gist.github.com/jkjung-avt/86b60a7723b97da19f7bfa3cb7d2690e
+# run:$ python testCameraJetsonTX2.py 
 
 import sys
 import argparse
@@ -118,6 +120,7 @@ def read_cam(cap):
                         1.0, (32, 32, 32), 4, cv2.LINE_AA)
             cv2.putText(img, help_text, (10, 20), font,
                         1.0, (240, 240, 240), 1, cv2.LINE_AA)
+        img = cv2.flip(img, 0)
         cv2.imshow(WINDOW_NAME, img)
         key = cv2.waitKey(10)
         if key == 27: # ESC key: quit program

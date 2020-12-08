@@ -23,11 +23,13 @@ def get_face_location(img):
 
 def get_face_landmark(img):
     face_location = get_face_location(img)
+    # print("face_location: ", face_location)
     return pose_predictor(img, face_location) if face_location else None
 
 
 def get_face_encode(img):
     landmark = get_face_landmark(img)
+    # print("landmark: ", landmark)
     return np.array(face_encoder.compute_face_descriptor(img, landmark)) if landmark else None
 
 
@@ -39,8 +41,8 @@ def get_emb_distance(emb1, emb2):
 def compare_distance(emb1, emb2, j):
     global num, name
     distance = get_emb_distance(emb1, emb2)
+    # print(distance)
     if distance < 0.6:
-        # print(distance)
         num += 1
         name = j
 
@@ -58,12 +60,14 @@ def read_image_encode(emb1):
 
 
 def determine_persion():
+    # print(name, ": ", num)
     if num > 2:
         print(name, ": ", num)
 
 imgReconigition_path = os.path.join(imagesReconigition_folder, sys.argv[1])
 img1 = np.array(Image.open(imgReconigition_path))
+# print(img1)
 emb1 = get_face_encode(img1)
-print(imgReconigition_path)
+print(imgReconigition_path, "face_encode: ", emb1)
 read_image_encode(emb1)
 print()
